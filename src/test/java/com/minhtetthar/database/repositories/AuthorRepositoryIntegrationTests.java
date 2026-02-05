@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -54,31 +53,55 @@ public class AuthorRepositoryIntegrationTests {
         assertTrue(((Collection<?>) result).contains(authorC), "Author C should be in the database");
     }
 
-    // @Test
-    // public void testThatAuthorCanBeUpdated() {
-    // Author authorA = TestDataUtil.createAuthorTestA();
-    // underTest.create(authorA);
+    @Test
+    public void testThatAuthorCanBeUpdated() {
+        Author authorA = TestDataUtil.createAuthorTestA();
+        underTest.save(authorA);
 
-    // authorA.setName("Updated Name");
-    // underTest.update(authorA.getId(), authorA);
+        authorA.setName("UPDATED NAME");
+        underTest.save(authorA);
 
-    // Optional<Author> result = underTest.findOne(authorA.getId());
-    // assertTrue(result.isPresent(), "Author should be found in database after
-    // update");
-    // assertEquals(authorA, result.get(), "Retrieved author should match updated
-    // author");
-    // }
+        Optional<Author> result = underTest.findById(authorA.getId());
+        assertTrue(result.isPresent(), "Author should be found in database after update");
+        assertEquals(authorA, result.get(), "Retrieved author should match updated author");
+    }
 
-    // @Test
-    // public void testThatAuthorCanBeDeleted() {
-    // Author authorA = TestDataUtil.createAuthorTestA();
-    // underTest.create(authorA);
+    @Test
+    public void testThatAuthorCanBeDeleted() {
+        Author authorA = TestDataUtil.createAuthorTestA();
+        underTest.save(authorA);
 
-    // underTest.delete(authorA.getId());
+        underTest.deleteById(authorA.getId());
 
-    // Optional<Author> result = underTest.findOne(authorA.getId());
-    // assertTrue(result.isEmpty(), "Author should not be found in database after
-    // deletion");
-    // }
+        Optional<Author> result = underTest.findById(authorA.getId());
+        assertTrue(result.isEmpty(), "Author should not be found in database afterdeletion");
+    }
+
+    @Test
+    public void testThatGetAuthorsWithAgeLessThan() {
+        Author authorA = TestDataUtil.createAuthorTestA();
+        underTest.save(authorA);
+        Author authorB = TestDataUtil.createAuthorTestB();
+        underTest.save(authorB);
+        Author authorC = TestDataUtil.createAuthorTestC();
+        underTest.save(authorC);
+
+        Iterable<Author> result = underTest.ageLessThan(78);
+        assertTrue(((Collection<?>) result).contains(authorA), "Author B should be in the result");
+        assertTrue(((Collection<?>) result).contains(authorC), "Author C should be in the result");
+    }
+
+    @Test
+    public void testThatGetAuthorsWithAgeGreaterThan() {
+        Author authorA = TestDataUtil.createAuthorTestA();
+        underTest.save(authorA);
+        Author authorB = TestDataUtil.createAuthorTestB();
+        underTest.save(authorB);
+        Author authorC = TestDataUtil.createAuthorTestC();
+        underTest.save(authorC);
+
+        Iterable<Author> result = underTest.findAuthorsWithAgeGreaterThan(78);
+        assertTrue(((Collection<?>) result).contains(authorA), "Author A should be in the result");
+    }
 
 }

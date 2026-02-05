@@ -63,36 +63,33 @@ public class BookRepositoryIntegrationTests {
         assertTrue(((Collection<?>) result).contains(bookC), "Book C should be in the database");
     }
 
-    // @Test
-    // public void testThatBookCanBeUpdated() {
-    // Author author = TestDataUtil.createAuthorTestA();
-    // authorDao.create(author);
+    @Test
+    public void testThatBookCanBeUpdated() {
+        Author author = TestDataUtil.createAuthorTestA();
+        authorRepository.save(author);
 
-    // Book bookA = TestDataUtil.createBookTestA();
-    // bookA.setAuthorId(author.getId());
-    // underTest.create(bookA);
+        Book bookA = TestDataUtil.createBookTestA(author);
+        bookRepository.save(bookA);
 
-    // bookA.setTitle(("UPDATED"));
-    // underTest.update(bookA.getIsbn(), bookA);
+        bookA.setTitle(("UPDATED"));
+        bookRepository.save(bookA);
 
-    // Optional<Book> result = underTest.findOne(bookA.getIsbn());
-    // assertTrue(result.isPresent(), "Updated book should be found in database");
-    // assertEquals(bookA, result.get(), "Retrieved book should match updated
-    // book");
-    // }
+        Optional<Book> result = bookRepository.findById(bookA.getIsbn());
+        assertTrue(result.isPresent(), "Updated book should be found in database");
+        assertEquals(bookA, result.get(), "Retrieved book should match updated book");
+    }
 
-    // @Test
-    // public void testThatBookCanBeDeleted() {
-    // Author author = TestDataUtil.createAuthorTestA();
-    // authorDao.create(author);
+    @Test
+    public void testThatBookCanBeDeleted() {
+        Author author = TestDataUtil.createAuthorTestA();
+        authorRepository.save(author);
 
-    // Book bookA = TestDataUtil.createBookTestA();
-    // bookA.setAuthorId(author.getId());
-    // underTest.create(bookA);
+        Book bookA = TestDataUtil.createBookTestA(author);
+        bookRepository.save(bookA);
 
-    // underTest.delete(bookA.getIsbn());
+        bookRepository.deleteById(bookA.getIsbn());
 
-    // Optional<Book> result = underTest.findOne(bookA.getIsbn());
-    // assertTrue(result.isEmpty(), "Deleted book should not be found in database");
-    // }
+        Optional<Book> result = bookRepository.findById(bookA.getIsbn());
+        assertTrue(result.isEmpty(), "Deleted book should not be found in database");
+    }
 }
