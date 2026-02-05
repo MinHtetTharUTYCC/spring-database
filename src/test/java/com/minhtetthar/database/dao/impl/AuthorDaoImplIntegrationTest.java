@@ -54,4 +54,28 @@ public class AuthorDaoImplIntegrationTest {
         assertTrue(result.contains(authorC), "Author C should be in the database");
     }
 
+    @Test
+    public void testThatAuthorCanBeUpdated() {
+        Author authorA = TestDataUtil.createAuthorTestA();
+        underTest.create(authorA);
+
+        authorA.setName("Updated Name");
+        underTest.update(authorA.getId(), authorA);
+
+        Optional<Author> result = underTest.findOne(authorA.getId());
+        assertTrue(result.isPresent(), "Author should be found in database after update");
+        assertEquals(authorA, result.get(), "Retrieved author should match updated author");
+    }
+
+    @Test
+    public void testThatAuthorCanBeDeleted() {
+        Author authorA = TestDataUtil.createAuthorTestA();
+        underTest.create(authorA);
+
+        underTest.delete(authorA.getId());
+
+        Optional<Author> result = underTest.findOne(authorA.getId());
+        assertTrue(result.isEmpty(), "Author should not be found in database after deletion");
+    }
+
 }

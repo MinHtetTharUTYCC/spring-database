@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.minhtetthar.database.TestDataUtil;
@@ -18,6 +19,7 @@ import com.minhtetthar.database.domain.Book;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class BookDaoImplIntegrationTest {
 
     private AuthorDao authorDao;
@@ -63,4 +65,35 @@ public class BookDaoImplIntegrationTest {
         assertTrue(result.contains(bookC), "Book C should be in the database");
     }
 
+    @Test
+    public void testThatBookCanBeUpdated() {
+        Author author = TestDataUtil.createAuthorTestA();
+        authorDao.create(author);
+
+        Book bookA = TestDataUtil.createBookTestA();
+        bookA.setAuthorId(author.getId());
+        underTest.create(bookA);
+
+        bookA.setTitle(("UPDATED"));
+        underTest.update(bookA.getIsbn(), bookA);
+
+        Optional<Book> result = underTest.findOne(bookA.getIsbn());
+        assertTrue(result.isPresent(), "Updated book should be found in database");
+        assertEquals(bookA, result.get(), "Retrieved book should match updated book");
+    }
+
+    @Test
+    public void testThatBookCanBeDeleted() {
+        Author author = TestDataUtil.createAuthorTestA();
+        authorDao.create(author);
+
+        Book bookA = TestDataUtil.createBookTestA();
+        bookA.setAuthorId(author.getId());
+        underTest.create(bookA);
+
+        underTest.delete(bookA.getIsbn());
+
+        Optional<Book> result = underTest.findOne(bookA.getIsbn());
+        assertTrue(result.isEmpty(), "Deleted book should not be found in database");
+    }
 }

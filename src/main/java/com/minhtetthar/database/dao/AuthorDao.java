@@ -12,4 +12,8 @@ public interface AuthorDao {
 
     List<Author> findMany();
 
+    void update(long id, Author author);
+
+    void delete(long l);
+
 }

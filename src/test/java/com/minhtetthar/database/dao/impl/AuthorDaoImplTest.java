@@ -61,4 +61,26 @@ public class AuthorDaoImplTest {
                 any(AuthorDaoImpl.AuthorRowMapper.class));
     }
 
+    @Test
+    public void testThatUpdateGeneratesCorrectSql() {
+        Author author = TestDataUtil.createAuthorTestA();
+        underTest.update(author.getId(), author);
+
+        verify(jdbcTemplate).update(
+                eq("UPDATE authors SET id = ?, name = ?, age = ? WHERE id = ?"),
+                eq(111L),
+                eq("Minzo"),
+                eq(80),
+                eq(111L));
+    }
+
+    @Test
+    public void testThatDeleteGeneratesCorrectSql() {
+        underTest.delete(1L);
+
+        verify(jdbcTemplate).update(
+                eq("DELETE from authors WHERE id = ?"),
+                eq(1L));
+    }
+
 }

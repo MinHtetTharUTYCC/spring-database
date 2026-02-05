@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.minhtetthar.database.TestDataUtil;
 import com.minhtetthar.database.domain.Book;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,6 +57,28 @@ public class BookDaoImplTest {
         verify(jdbcTemplate).query(
                 eq("SELECT isbn, title, author_id from books"),
                 any(BookDaoImpl.BookRowMapper.class));
+    }
+
+    @Test
+    public void testThatUpdateGeneratesCorrectSql() {
+        Book book = TestDataUtil.createBookTestA();
+        underTest.update("1232-2434-2353-2353", book);
+
+        verify(jdbcTemplate).update(
+                eq("UPDATE books SET isbn = ?, title = ?, author_id = ? WHERE isbn = ?"),
+                eq("1234-5678-9012-3456-1"),
+                eq("Mockito for Dummies"),
+                eq(999L),
+                eq("1232-2434-2353-2353"));
+    }
+
+    @Test
+    public void testThatDeleteGeneratesCorrectSql() {
+        underTest.delete("1232-2434-2353-2353");
+
+        verify(jdbcTemplate).update(
+                eq("DELETE from books WHERE isbn = ?"),
+                eq("1232-2434-2353-2353"));
     }
 
 }
