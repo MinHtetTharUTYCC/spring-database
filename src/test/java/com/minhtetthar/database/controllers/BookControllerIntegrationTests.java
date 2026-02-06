@@ -115,8 +115,8 @@ public class BookControllerIntegrationTests {
                                 MockMvcRequestBuilders.get("/books")
                                                 .accept(MediaType.APPLICATION_JSON))
                                 .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.jsonPath("$[0].isbn").value("1234-5678-9012-3456-1"))
-                                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Mockito for Dummies"));
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].isbn").value("1234-5678-9012-3456-1"))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].title").value("Mockito for Dummies"));
 
         }
 
@@ -153,6 +153,60 @@ public class BookControllerIntegrationTests {
                                 .andExpect(MockMvcResultMatchers.jsonPath("$.isbn").value(createdBook.getIsbn()))
                                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value(createdBook.getTitle()))
                                 .andExpect(MockMvcResultMatchers.jsonPath("$.author").value(createdBook.getAuthor()));
+        }
+
+        @Test
+        public void testThatParticalUpdateBookReturnsHttpStatus200Ok() throws Exception {
+                BookEntity bookEntityA = TestDataUtil.createBookTestA(null);
+                // Create
+                BookEntity createdBookEntityA = bookService.createUpdateBook(bookEntityA.getIsbn(), bookEntityA);
+
+                BookDto bookDtoA = TestDataUtil.createTestBookDtoA(null);
+                bookDtoA.setIsbn(createdBookEntityA.getIsbn());
+                String bookJson = objectMapper.writeValueAsString(bookDtoA);
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.patch("/books/" + bookEntityA.getIsbn())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(bookJson))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
+        }
+
+        @Test
+        public void testThatParticalUpdateBookReturnsUpdatedBook() throws Exception {
+                BookEntity bookEntityA = TestDataUtil.createBookTestA(null);
+                // Create
+                BookEntity createdBookEntityA = bookService.createUpdateBook(bookEntityA.getIsbn(), bookEntityA);
+
+                BookDto bookDtoA = TestDataUtil.createTestBookDtoA(null);
+                bookDtoA.setTitle("UPDATED TITLE");
+                String bookJson = objectMapper.writeValueAsString(bookDtoA);
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.patch("/books/" + createdBookEntityA.getIsbn())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(bookJson))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.isbn").value(createdBookEntityA.getIsbn()))
+                                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("UPDATED TITLE"));
+        }
+
+        @Test
+        public void testThatDeleteBookReturns204NoContentWhenBookExists() throws Exception {
+                BookEntity bookEntityA = TestDataUtil.createBookTestA(null);
+                bookService.createUpdateBook(bookEntityA.getIsbn(), bookEntityA);
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.delete("/books/" + bookEntityA.getIsbn())
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        }
+
+        @Test
+        public void testThatDeleteBookReturns404NotFoundWhenBookDoesNotExist() throws Exception {
+                mockMvc.perform(
+                                MockMvcRequestBuilders.delete("/books/" + "isbn-that-does-not-exist")
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNotFound());
         }
 
 }
