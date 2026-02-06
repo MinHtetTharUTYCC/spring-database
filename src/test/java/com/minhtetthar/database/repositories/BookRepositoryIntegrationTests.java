@@ -14,8 +14,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.minhtetthar.database.TestDataUtil;
-import com.minhtetthar.database.domain.Author;
-import com.minhtetthar.database.domain.Book;
+import com.minhtetthar.database.domain.entities.AuthorEntity;
+import com.minhtetthar.database.domain.entities.BookEntity;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -33,30 +33,30 @@ public class BookRepositoryIntegrationTests {
 
     @Test
     public void testThatBookCanBeCreatedAndRecalled() {
-        Author author = TestDataUtil.createAuthorTestA();
+        AuthorEntity author = TestDataUtil.createAuthorTestA();
         authorRepository.save(author);
-        Book book = TestDataUtil.createBookTestA(author);
+        BookEntity book = TestDataUtil.createBookTestA(author);
         bookRepository.save(book);
-        Optional<Book> result = bookRepository.findById(book.getIsbn());
+        Optional<BookEntity> result = bookRepository.findById(book.getIsbn());
         assertTrue(result.isPresent(), "Book should be found in database");
         assertEquals(book, result.get(), "Retrieved book should match created book");
     }
 
     @Test
     public void testThatMultipleBooksCanBeCreatedAndRecalled() {
-        Author author = TestDataUtil.createAuthorTestA();
+        AuthorEntity author = TestDataUtil.createAuthorTestA();
         authorRepository.save(author);
 
-        Book bookA = TestDataUtil.createBookTestA(author);
+        BookEntity bookA = TestDataUtil.createBookTestA(author);
         bookRepository.save(bookA);
 
-        Book bookB = TestDataUtil.createBookTestB(author);
+        BookEntity bookB = TestDataUtil.createBookTestB(author);
         bookRepository.save(bookB);
 
-        Book bookC = TestDataUtil.createBookTestC(author);
+        BookEntity bookC = TestDataUtil.createBookTestC(author);
         bookRepository.save(bookC);
 
-        Iterable<Book> result = bookRepository.findAll();
+        Iterable<BookEntity> result = bookRepository.findAll();
         assertEquals(3, ((Collection<?>) result).size(), "There should be three books in the database");
         assertTrue(((Collection<?>) result).contains(bookA), "Book A should be in the database");
         assertTrue(((Collection<?>) result).contains(bookB), "Book B should be in the database");
@@ -65,31 +65,31 @@ public class BookRepositoryIntegrationTests {
 
     @Test
     public void testThatBookCanBeUpdated() {
-        Author author = TestDataUtil.createAuthorTestA();
+        AuthorEntity author = TestDataUtil.createAuthorTestA();
         authorRepository.save(author);
 
-        Book bookA = TestDataUtil.createBookTestA(author);
+        BookEntity bookA = TestDataUtil.createBookTestA(author);
         bookRepository.save(bookA);
 
         bookA.setTitle(("UPDATED"));
         bookRepository.save(bookA);
 
-        Optional<Book> result = bookRepository.findById(bookA.getIsbn());
+        Optional<BookEntity> result = bookRepository.findById(bookA.getIsbn());
         assertTrue(result.isPresent(), "Updated book should be found in database");
         assertEquals(bookA, result.get(), "Retrieved book should match updated book");
     }
 
     @Test
     public void testThatBookCanBeDeleted() {
-        Author author = TestDataUtil.createAuthorTestA();
+        AuthorEntity author = TestDataUtil.createAuthorTestA();
         authorRepository.save(author);
 
-        Book bookA = TestDataUtil.createBookTestA(author);
+        BookEntity bookA = TestDataUtil.createBookTestA(author);
         bookRepository.save(bookA);
 
         bookRepository.deleteById(bookA.getIsbn());
 
-        Optional<Book> result = bookRepository.findById(bookA.getIsbn());
+        Optional<BookEntity> result = bookRepository.findById(bookA.getIsbn());
         assertTrue(result.isEmpty(), "Deleted book should not be found in database");
     }
 }
